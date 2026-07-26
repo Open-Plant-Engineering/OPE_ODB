@@ -1,0 +1,14 @@
+!world                  = /*
+!mem                    = !world.mem
+!!elmTypes              = object array()
+
+do !elm value !mem
+    !allElm             = !!collectAllFor(||, ||, !elm)
+    !blockTypes         = object BLOCK(|!allElm[!evalIndex].type|)
+    !typeNames          = !allElm.evaluate(!blockTypes)
+    !typeNames          = !typeNames.unique()
+    !!elmTypes.appendArray(!typeNames)
+    !!elmTypes          = !!elmTypes.unique()
+enddo
+
+q var !!elmTypes

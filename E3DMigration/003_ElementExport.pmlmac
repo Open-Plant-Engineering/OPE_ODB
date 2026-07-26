@@ -1,0 +1,22 @@
+!world                  = /*
+!mems                   = !world.mem
+
+!file           = object FILE('c:\temp\hierarchy.txt')
+!file.open( 'w' )
+
+do !mem value !mems
+    skip if !mem.type.eq('GPWL')
+    !allElm             = !!collectAllFor(||, |type neq 'TUBI'|, !mem)
+    do !elm value !allElm
+        !ref1           = !elm.refno.string().before('/').replace('=', '')
+        !ref2           = !elm.refno.string().after('/')
+        !ownerRef1      = !elm.owner.refno.string().before('/').replace('=', '')
+        !ownerRef2      = !elm.owner.refno.string().after('/')
+        !sequence       = !elm.sequence
+        !typeName       = !elm.type
+
+        !file.WRITERECORD( !ref1 + ' , ' + !ref2 + ' , ' + !ownerRef1 + ' , ' + !ownerRef2 + ' , ' + !sequence.string() + ' , ' + !typeName  )
+    enddo
+enddo
+
+!file.close()

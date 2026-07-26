@@ -1,0 +1,35 @@
+!PipeSites            = !!collectAllFor(|sites|, |purp eq 'PIPE'|, WORLD)
+
+!file           = object FILE('c:\temp\stringValues.txt')
+!file.open( 'w' )
+
+do !PipeSite value !PipeSites
+    !allElm             = !!collectAllFor(||, |type neq 'TUBI'|, !PipeSite)
+    do !elm value !allElm
+        !ELEMENTTYPE    = object ELEMENTTYPE(!elm.type)
+        !output         = object ARRAY()
+        !ref1           = !elm.refno.string().before('/').replace('=', '')
+        !ref2           = !elm.refno.string().after('/')
+        q var !elm.refno.string()
+        do !sysAtt value !ELEMENTTYPE.SYSTEMATTRIBUTES()
+            !isText     = !sysAtt.type().eq('TEXT') and !sysAtt.category().neq('')
+            skip if !isText.not()
+            !attName    = !sysAtt.name() 
+            !attValue   = !elm.attribute(!attName)
+            !hasAttValue = !attValue.neq('') and !attValue.match('=').eq(0) and !attValue.neq('unset')
+            skip if !hasAttValue.not()
+            !file.WRITERECORD( !ref1 + ' , ' + !ref2 + ' , ' + !attName + ' , ' + !attValue )
+        enddo
+        do !udaAtt value !ELEMENTTYPE.UDAS()
+            !isText     = !udaAtt.type().eq('TEXT') and !udaAtt.category().neq('')
+            skip if !isText.not()
+            !attName    = !udaAtt.name() 
+            !attValue   = !elm.attribute(!attName)
+            !hasAttValue = !attValue.neq('') and !attValue.match('=').eq(0) and !attValue.neq('unset')
+            skip if !hasAttValue.not()
+            !file.WRITERECORD( !ref1 + ' , ' + !ref2 + ' , ' + !attName + ' , ' + !attValue )
+        enddo
+    enddo
+enddo
+
+!file.close()

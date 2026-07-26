@@ -1,0 +1,39 @@
+Step 3
+-------
+Import Attribute Definitions
+
+Step 4
+-------
+Import Elements
+
+Step 5
+-------
+Import String Pool
+
+Step 6
+-------
+Import TEXT values
+
+Step 7
+-------
+Import REAL values
+
+Step 8
+-------
+Import INTEGER values
+
+Step 9
+-------
+Import LOGICAL values
+
+Step 10
+--------
+Import REFERENCE values
+
+Step 11
+--------
+Import POSITION/DIRECTION/ORIENTATION
+
+Step 12
+--------
+Import remaining arrays
