@@ -54,6 +54,8 @@ create table value_string
 
     string_id       bigint not null,
 
+    is_deleted      boolean not null default false,
+
     primary key
     (
         container_id,
@@ -97,6 +99,9 @@ create table value_string
 comment on table value_string is
 'STRING values (TEXT and WORD)';
 
+comment on column value_string.is_deleted is
+'Logical delete flag. False = active, True = deleted';
+
 -- =====================================================
 -- NUMBER VALUES
 -- =====================================================
@@ -109,6 +114,8 @@ create table value_number
     attribute_id    integer not null,
 
     value           double precision not null,
+
+    is_deleted      boolean not null default false,
 
     primary key
     (
@@ -143,6 +150,9 @@ create table value_number
 comment on table value_number is
 'NUMBER values (REAL and INTEGER)';
 
+comment on column value_number.is_deleted is
+'Logical delete flag. False = active, True = deleted';
+
 -- =====================================================
 -- LOGICAL VALUES
 -- =====================================================
@@ -155,6 +165,8 @@ create table value_logical
     attribute_id    integer not null,
 
     value           boolean not null,
+
+    is_deleted      boolean not null default false,
 
     primary key
     (
@@ -186,6 +198,9 @@ create table value_logical
         )
 );
 
+comment on column value_logical.is_deleted is
+'Logical delete flag. False = active, True = deleted';
+
 -- =====================================================
 -- REFERENCE VALUES
 -- =====================================================
@@ -199,6 +214,8 @@ create table value_reference
 
     ref_container_id    bigint not null,
     ref_local_id        bigint not null,
+
+    is_deleted      boolean not null default false,
 
     primary key
     (
@@ -242,6 +259,9 @@ create table value_reference
         )
 );
 
+comment on column value_reference.is_deleted is
+'Logical delete flag. False = active, True = deleted';
+
 
 -- =====================================================
 -- POSITION VALUES
@@ -255,6 +275,8 @@ create table value_position
     attribute_id    integer not null,
 
     vector3_id      bigint not null,
+
+    is_deleted      boolean not null default false,
 
     primary key
     (
@@ -296,6 +318,9 @@ create table value_position
         )
 );
 
+comment on column value_position.is_deleted is
+'Logical delete flag. False = active, True = deleted';
+
 -- =====================================================
 -- DIRECTION VALUES
 -- =====================================================
@@ -308,6 +333,8 @@ create table value_direction
     attribute_id    integer not null,
 
     vector3_id      bigint not null,
+
+    is_deleted      boolean not null default false,
 
     primary key
     (
@@ -349,6 +376,9 @@ create table value_direction
         )
 );
 
+comment on column value_direction.is_deleted is
+'Logical delete flag. False = active, True = deleted';
+
 -- =====================================================
 -- ORIENTATION VALUES
 -- =====================================================
@@ -361,6 +391,8 @@ create table value_orientation
     attribute_id    integer not null,
 
     vector3_id      bigint not null,
+
+    is_deleted      boolean not null default false,
 
     primary key
     (
@@ -402,6 +434,9 @@ create table value_orientation
         )
 );
 
+comment on column value_orientation.is_deleted is
+'Logical delete flag. False = active, True = deleted';
+
 -- =====================================================
 -- DATETIME VALUES
 -- =====================================================
@@ -414,6 +449,8 @@ create table value_datetime
     attribute_id    integer not null,
 
     value           timestamp not null,
+
+    is_deleted      boolean not null default false,
 
     primary key
     (
@@ -445,6 +482,9 @@ create table value_datetime
         )
 );
 
+comment on column value_datetime.is_deleted is
+'Logical delete flag. False = active, True = deleted';
+
 -- =====================================================
 -- JSON VALUES
 -- =====================================================
@@ -457,6 +497,8 @@ create table value_json
     attribute_id    integer not null,
 
     value           jsonb not null,
+
+    is_deleted      boolean not null default false,
 
     primary key
     (
@@ -488,6 +530,9 @@ create table value_json
         )
 );
 
+comment on column value_json.is_deleted is
+'Logical delete flag. False = active, True = deleted';
+
 -- =====================================================
 -- BLOB VALUES
 -- =====================================================
@@ -500,6 +545,8 @@ create table value_blob
     attribute_id    integer not null,
 
     value           bytea not null,
+
+    is_deleted      boolean not null default false,
 
     primary key
     (
@@ -531,6 +578,9 @@ create table value_blob
         )
 );
 
+comment on column value_blob.is_deleted is
+'Logical delete flag. False = active, True = deleted';
+
 -- =====================================================
 -- UUID VALUES
 -- =====================================================
@@ -543,6 +593,8 @@ create table value_uuid
     attribute_id    integer not null,
 
     value           uuid not null,
+
+    is_deleted      boolean not null default false,
 
     primary key
     (
@@ -573,3 +625,6 @@ create table value_uuid
             attribute_id
         )
 );
+
+comment on column value_uuid.is_deleted is
+'Logical delete flag. False = active, True = deleted';

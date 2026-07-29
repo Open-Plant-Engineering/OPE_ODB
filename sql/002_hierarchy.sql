@@ -19,6 +19,8 @@ create table element
 
     sequence_no         integer not null default 0,
 
+    is_deleted          boolean not null default false,
+
     primary key
     (
         container_id,
@@ -59,3 +61,6 @@ comment on column element.owner_local_id is
 
 comment on column element.sequence_no is
 'Child sequence number within owner';
+
+comment on column element.is_deleted is
+'Logical delete flag. False = active, True = deleted';

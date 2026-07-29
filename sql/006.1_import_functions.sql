@@ -167,7 +167,9 @@ begin
         owner_container_id,
         owner_local_id,
 
-        sequence_no
+        sequence_no,
+
+        is_deleted
     )
     values
     (
@@ -179,7 +181,9 @@ begin
         p_owner_container_id,
         p_owner_local_id,
 
-        p_sequence_no
+        p_sequence_no,
+
+        false
     )
     on conflict
     (
@@ -191,7 +195,8 @@ begin
         type_id            = excluded.type_id,
         owner_container_id = excluded.owner_container_id,
         owner_local_id     = excluded.owner_local_id,
-        sequence_no        = excluded.sequence_no;
+        sequence_no        = excluded.sequence_no,
+        is_deleted         = false;
 
 end;
 $$;

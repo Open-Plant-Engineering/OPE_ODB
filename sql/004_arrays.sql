@@ -18,6 +18,8 @@ create table array_string
 
     string_id       bigint not null,
 
+    is_deleted      boolean not null default false,
+
     primary key
     (
         container_id,
@@ -62,6 +64,9 @@ create table array_string
 comment on table array_string is
 'Array of STRING values';
 
+comment on column array_string.is_deleted is
+'Logical delete flag. False = active, True = deleted';
+
 -- =====================================================
 -- NUMBER ARRAYS
 -- =====================================================
@@ -76,6 +81,8 @@ create table array_number
     sequence_no     integer not null,
 
     value           double precision not null,
+
+    is_deleted      boolean not null default false,
 
     primary key
     (
@@ -111,6 +118,9 @@ create table array_number
 comment on table array_number is
 'Array of NUMBER values';
 
+comment on column array_number.is_deleted is
+'Logical delete flag. False = active, True = deleted';
+
 -- =====================================================
 -- LOGICAL ARRAYS
 -- =====================================================
@@ -125,6 +135,8 @@ create table array_logical
     sequence_no     integer not null,
 
     value           boolean not null,
+
+    is_deleted      boolean not null default false,
 
     primary key
     (
@@ -160,6 +172,9 @@ create table array_logical
 comment on table array_logical is
 'Array of LOGICAL values';
 
+comment on column array_logical.is_deleted is
+'Logical delete flag. False = active, True = deleted';
+
 -- =====================================================
 -- REFERENCE ARRAYS
 -- =====================================================
@@ -175,6 +190,8 @@ create table array_reference
 
     ref_container_id    bigint not null,
     ref_local_id        bigint not null,
+
+    is_deleted      boolean not null default false,
 
     primary key
     (
@@ -222,6 +239,9 @@ create table array_reference
 comment on table array_reference is
 'Array of REFERENCE values';
 
+comment on column array_reference.is_deleted is
+'Logical delete flag. False = active, True = deleted';
+
 -- =====================================================
 -- POSITION ARRAYS
 -- =====================================================
@@ -236,6 +256,8 @@ create table array_position
     sequence_no     integer not null,
 
     vector3_id      bigint not null,
+
+    is_deleted      boolean not null default false,
 
     primary key
     (
@@ -281,6 +303,10 @@ create table array_position
 comment on table array_position is
 'Array of POSITION values';
 
+comment on column array_position.is_deleted is
+'Logical delete flag. False = active, True = deleted';
+
+
 -- =====================================================
 -- DIRECTION ARRAYS
 -- =====================================================
@@ -295,6 +321,8 @@ create table array_direction
     sequence_no     integer not null,
 
     vector3_id      bigint not null,
+
+    is_deleted      boolean not null default false,
 
     primary key
     (
@@ -340,6 +368,9 @@ create table array_direction
 comment on table array_direction is
 'Array of DIRECTION values';
 
+comment on column array_direction.is_deleted is
+'Logical delete flag. False = active, True = deleted';
+
 -- =====================================================
 -- ORIENTATION ARRAYS
 -- =====================================================
@@ -354,6 +385,8 @@ create table array_orientation
     sequence_no     integer not null,
 
     vector3_id      bigint not null,
+
+    is_deleted      boolean not null default false,
 
     primary key
     (
@@ -399,6 +432,9 @@ create table array_orientation
 comment on table array_orientation is
 'Array of ORIENTATION values';
 
+comment on column array_orientation.is_deleted is
+'Logical delete flag. False = active, True = deleted';
+
 -- =====================================================
 -- DATETIME ARRAYS
 -- =====================================================
@@ -413,6 +449,8 @@ create table array_datetime
     sequence_no     integer not null,
 
     value           timestamp not null,
+
+    is_deleted      boolean not null default false,
 
     primary key
     (
@@ -448,6 +486,9 @@ create table array_datetime
 comment on table array_datetime is
 'Array of DATETIME values';
 
+comment on column array_datetime.is_deleted is
+'Logical delete flag. False = active, True = deleted';
+
 -- =====================================================
 -- JSON ARRAYS
 -- =====================================================
@@ -462,6 +503,8 @@ create table array_json
     sequence_no     integer not null,
 
     value           jsonb not null,
+
+    is_deleted      boolean not null default false,
 
     primary key
     (
@@ -497,6 +540,9 @@ create table array_json
 comment on table array_json is
 'Array of JSON values';
 
+comment on column array_json.is_deleted is
+'Logical delete flag. False = active, True = deleted';
+
 -- =====================================================
 -- BLOB ARRAYS
 -- =====================================================
@@ -511,6 +557,8 @@ create table array_blob
     sequence_no     integer not null,
 
     value           bytea not null,
+
+    is_deleted      boolean not null default false,
 
     primary key
     (
@@ -546,6 +594,9 @@ create table array_blob
 comment on table array_blob is
 'Array of BLOB values';
 
+comment on column array_blob.is_deleted is
+'Logical delete flag. False = active, True = deleted';
+
 -- =====================================================
 -- UUID ARRAYS
 -- =====================================================
@@ -560,6 +611,8 @@ create table array_uuid
     sequence_no     integer not null,
 
     value           uuid not null,
+
+    is_deleted      boolean not null default false,
 
     primary key
     (
@@ -594,3 +647,6 @@ create table array_uuid
 
 comment on table array_uuid is
 'Array of UUID values';
+
+comment on column array_uuid.is_deleted is
+'Logical delete flag. False = active, True = deleted';

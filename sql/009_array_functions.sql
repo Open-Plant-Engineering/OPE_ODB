@@ -47,7 +47,8 @@ begin
     )
     do update
     set
-        string_id = excluded.string_id;
+        string_id = excluded.string_id,
+        is_deleted = false;
 
 end;
 $$;
@@ -109,7 +110,8 @@ begin
     )
     do update
     set
-        value = excluded.value;
+        value = excluded.value,
+        is_deleted = false;
 
 end;
 $$;
@@ -167,7 +169,8 @@ begin
     )
     do update
     set
-        value = excluded.value;
+        value = excluded.value,
+        is_deleted = false;
 
 end;
 $$;
@@ -229,7 +232,8 @@ begin
     do update
     set
         ref_container_id = excluded.ref_container_id,
-        ref_local_id     = excluded.ref_local_id;
+        ref_local_id     = excluded.ref_local_id,
+        is_deleted = false;
 
 end;
 $$;
@@ -299,7 +303,8 @@ begin
     )
     do update
     set
-        vector3_id = excluded.vector3_id;
+        vector3_id = excluded.vector3_id,
+        is_deleted = false;
 
 end;
 $$;
@@ -368,7 +373,8 @@ begin
     )
     do update
     set
-        vector3_id = excluded.vector3_id;
+        vector3_id = excluded.vector3_id,
+        is_deleted = false;
 
 end;
 $$;
@@ -437,7 +443,8 @@ begin
     )
     do update
     set
-        vector3_id = excluded.vector3_id;
+        vector3_id = excluded.vector3_id,
+        is_deleted = false;
 
 end;
 $$;
@@ -501,7 +508,8 @@ begin
     )
     do update
     set
-        value = excluded.value;
+        value = excluded.value,
+        is_deleted = false;
 
 end;
 $$;
@@ -562,7 +570,8 @@ begin
     )
     do update
     set
-        value = excluded.value;
+        value = excluded.value,
+        is_deleted = false;
 
 end;
 $$;
@@ -623,7 +632,8 @@ begin
     )
     do update
     set
-        value = excluded.value;
+        value = excluded.value,
+        is_deleted = false;
 
 end;
 $$;
@@ -684,7 +694,8 @@ begin
     )
     do update
     set
-        value = excluded.value;
+        value = excluded.value,
+        is_deleted = false;
 
 end;
 $$;

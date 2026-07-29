@@ -18,7 +18,8 @@ as
 $$
     select type_id
     from node_type
-    where upper(type_name) = upper(trim(p_type_name));
+    where upper(trim(type_name)) = upper(trim(p_type_name))
+    limit 1;
 $$;
 
 comment on function get_type_id
@@ -43,7 +44,8 @@ as
 $$
     select datatype_id
     from datatype
-    where upper(datatype_name) = upper(trim(p_datatype_name));
+    where upper(trim(datatype_name)) = upper(trim(p_datatype_name))
+    limit 1;
 $$;
 
 comment on function get_datatype_id
