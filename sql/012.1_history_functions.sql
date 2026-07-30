@@ -55,6 +55,15 @@ begin
 end;
 $$;
 
+comment on function save_history_element
+(
+    bigint,
+    bigint,
+    bigint
+)
+is
+'Saves the original element state for a revision';
+
 -- =====================================================
 -- SAVE HISTORY STRING
 -- =====================================================
@@ -122,53 +131,6 @@ comment on function save_history_string
 )
 is
 'Saves the original string value state for a revision';
-
-
-create or replace function save_history_number
-(
-    p_revision_id  bigint,
-    p_container_id bigint,
-    p_local_id     bigint,
-    p_attribute_id integer
-)
-returns void
-language plpgsql
-as
-$$
-begin
-
-    insert into history_number
-    (
-        revision_id,
-        container_id,
-        local_id,
-        attribute_id,
-        value,
-        is_deleted
-    )
-    select
-        p_revision_id,
-        v.container_id,
-        v.local_id,
-        v.attribute_id,
-        v.value,
-        v.is_deleted
-    from value_number v
-    where v.container_id = p_container_id
-      and v.local_id     = p_local_id
-      and v.attribute_id = p_attribute_id
-
-    on conflict
-    (
-        revision_id,
-        container_id,
-        local_id,
-        attribute_id
-    )
-    do nothing;
-
-end;
-$$;
 
 -- =====================================================
 -- SAVE HISTORY NUMBER
@@ -419,5 +381,371 @@ comment on function save_history_position
 )
 is
 'Saves the original position value state for a revision';
+
+
+-- =====================================================
+-- SAVE HISTORY DIRECTION
+-- =====================================================
+
+create or replace function save_history_direction
+(
+    p_revision_id  bigint,
+    p_container_id bigint,
+    p_local_id     bigint,
+    p_attribute_id integer
+)
+returns void
+language plpgsql
+as
+$$
+begin
+
+    insert into history_direction
+    (
+        revision_id,
+        container_id,
+        local_id,
+        attribute_id,
+        vector3_id,
+        is_deleted
+    )
+    select
+        p_revision_id,
+        v.container_id,
+        v.local_id,
+        v.attribute_id,
+        v.vector3_id,
+        v.is_deleted
+    from value_direction v
+    where v.container_id = p_container_id
+      and v.local_id     = p_local_id
+      and v.attribute_id = p_attribute_id
+
+    on conflict
+    (
+        revision_id,
+        container_id,
+        local_id,
+        attribute_id
+    )
+    do nothing;
+
+end;
+$$;
+
+comment on function save_history_direction
+(
+    bigint,
+    bigint,
+    bigint,
+    integer
+)
+is
+'Saves the original direction value state for a revision';
+
+
+-- =====================================================
+-- SAVE HISTORY ORIENTATION
+-- =====================================================
+
+create or replace function save_history_orientation
+(
+    p_revision_id  bigint,
+    p_container_id bigint,
+    p_local_id     bigint,
+    p_attribute_id integer
+)
+returns void
+language plpgsql
+as
+$$
+begin
+
+    insert into history_orientation
+    (
+        revision_id,
+        container_id,
+        local_id,
+        attribute_id,
+        vector3_id,
+        is_deleted
+    )
+    select
+        p_revision_id,
+        v.container_id,
+        v.local_id,
+        v.attribute_id,
+        v.vector3_id,
+        v.is_deleted
+    from value_orientation v
+    where v.container_id = p_container_id
+      and v.local_id     = p_local_id
+      and v.attribute_id = p_attribute_id
+
+    on conflict
+    (
+        revision_id,
+        container_id,
+        local_id,
+        attribute_id
+    )
+    do nothing;
+
+end;
+$$;
+
+comment on function save_history_orientation
+(
+    bigint,
+    bigint,
+    bigint,
+    integer
+)
+is
+'Saves the original orientation value state for a revision';
+
+
+-- =====================================================
+-- SAVE HISTORY DATETIME
+-- =====================================================
+
+create or replace function save_history_datetime
+(
+    p_revision_id  bigint,
+    p_container_id bigint,
+    p_local_id     bigint,
+    p_attribute_id integer
+)
+returns void
+language plpgsql
+as
+$$
+begin
+
+    insert into history_datetime
+    (
+        revision_id,
+        container_id,
+        local_id,
+        attribute_id,
+        value,
+        is_deleted
+    )
+    select
+        p_revision_id,
+        v.container_id,
+        v.local_id,
+        v.attribute_id,
+        v.value,
+        v.is_deleted
+    from value_datetime v
+    where v.container_id = p_container_id
+      and v.local_id     = p_local_id
+      and v.attribute_id = p_attribute_id
+
+    on conflict
+    (
+        revision_id,
+        container_id,
+        local_id,
+        attribute_id
+    )
+    do nothing;
+
+end;
+$$;
+
+comment on function save_history_datetime
+(
+    bigint,
+    bigint,
+    bigint,
+    integer
+)
+is
+'Saves the original datetime value state for a revision';
+
+
+-- =====================================================
+-- SAVE HISTORY JSON
+-- =====================================================
+
+create or replace function save_history_json
+(
+    p_revision_id  bigint,
+    p_container_id bigint,
+    p_local_id     bigint,
+    p_attribute_id integer
+)
+returns void
+language plpgsql
+as
+$$
+begin
+
+    insert into history_json
+    (
+        revision_id,
+        container_id,
+        local_id,
+        attribute_id,
+        value,
+        is_deleted
+    )
+    select
+        p_revision_id,
+        v.container_id,
+        v.local_id,
+        v.attribute_id,
+        v.value,
+        v.is_deleted
+    from value_json v
+    where v.container_id = p_container_id
+      and v.local_id     = p_local_id
+      and v.attribute_id = p_attribute_id
+
+    on conflict
+    (
+        revision_id,
+        container_id,
+        local_id,
+        attribute_id
+    )
+    do nothing;
+
+end;
+$$;
+
+comment on function save_history_json
+(
+    bigint,
+    bigint,
+    bigint,
+    integer
+)
+is
+'Saves the original JSON value state for a revision';
+
+
+-- =====================================================
+-- SAVE HISTORY BLOB
+-- =====================================================
+
+create or replace function save_history_blob
+(
+    p_revision_id  bigint,
+    p_container_id bigint,
+    p_local_id     bigint,
+    p_attribute_id integer
+)
+returns void
+language plpgsql
+as
+$$
+begin
+
+    insert into history_blob
+    (
+        revision_id,
+        container_id,
+        local_id,
+        attribute_id,
+        value,
+        is_deleted
+    )
+    select
+        p_revision_id,
+        v.container_id,
+        v.local_id,
+        v.attribute_id,
+        v.value,
+        v.is_deleted
+    from value_blob v
+    where v.container_id = p_container_id
+      and v.local_id     = p_local_id
+      and v.attribute_id = p_attribute_id
+
+    on conflict
+    (
+        revision_id,
+        container_id,
+        local_id,
+        attribute_id
+    )
+    do nothing;
+
+end;
+$$;
+
+comment on function save_history_blob
+(
+    bigint,
+    bigint,
+    bigint,
+    integer
+)
+is
+'Saves the original BLOB value state for a revision';
+
+
+-- =====================================================
+-- SAVE HISTORY UUID
+-- =====================================================
+
+create or replace function save_history_uuid
+(
+    p_revision_id  bigint,
+    p_container_id bigint,
+    p_local_id     bigint,
+    p_attribute_id integer
+)
+returns void
+language plpgsql
+as
+$$
+begin
+
+    insert into history_uuid
+    (
+        revision_id,
+        container_id,
+        local_id,
+        attribute_id,
+        value,
+        is_deleted
+    )
+    select
+        p_revision_id,
+        v.container_id,
+        v.local_id,
+        v.attribute_id,
+        v.value,
+        v.is_deleted
+    from value_uuid v
+    where v.container_id = p_container_id
+      and v.local_id     = p_local_id
+      and v.attribute_id = p_attribute_id
+
+    on conflict
+    (
+        revision_id,
+        container_id,
+        local_id,
+        attribute_id
+    )
+    do nothing;
+
+end;
+$$;
+
+comment on function save_history_uuid
+(
+    bigint,
+    bigint,
+    bigint,
+    integer
+)
+is
+'Saves the original UUID value state for a revision';
 
 

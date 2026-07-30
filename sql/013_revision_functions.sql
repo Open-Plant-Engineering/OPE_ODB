@@ -166,3 +166,24 @@ comment on function get_revision_comment
 )
 is
 'Returns the comment of a revision';
+
+
+-- =====================================================
+-- GET LATEST REVISION
+-- =====================================================
+
+create or replace function get_latest_revision
+(
+)
+returns bigint
+language sql
+stable
+as
+$$
+    select max(revision_id)
+    from revision;
+$$;
+
+comment on function get_latest_revision()
+is
+'Returns the latest revision identifier';
