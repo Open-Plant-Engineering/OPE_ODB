@@ -16,9 +16,18 @@ def clean_database():
             cur.execute(
                 """
                 truncate table
+                    git_head,
+                    git_ref,
+                    git_commit_parent,
+                    git_commit,
+                    git_tree_entry,
+                    git_tree,
                     git_element_manifest_entry,
                     git_element_manifest,
-                    git_blob_chunk_pool
+                    git_element,
+                    git_blob_chunk_pool,
+                    repository
+                restart identity
                 cascade;
                 """
             )

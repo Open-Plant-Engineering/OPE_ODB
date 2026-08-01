@@ -7,7 +7,7 @@ create table repository
 (
     repository_id bigint generated always as identity primary key,
 
-    name text not null unique,
+    repository_name text not null unique,
 
     created_at timestamptz not null default now()
 );

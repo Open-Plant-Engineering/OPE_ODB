@@ -2141,3 +2141,500 @@ for values with (modulus 16, remainder 14);
 create table git_element_manifest_entry_p15
 partition of git_element_manifest_entry
 for values with (modulus 16, remainder 15);
+
+
+-- =====================================================
+-- repository_exists
+-- =====================================================
+
+create or replace function repository_exists
+(
+    p_repository_id bigint
+)
+returns boolean
+language sql
+stable
+as
+$$
+    select exists
+    (
+        select 1
+        from repository
+        where repository_id = p_repository_id
+    );
+$$;
+
+comment on function repository_exists(bigint)
+is 'Checks whether a repository exists.';
+
+
+-- =====================================================
+-- create_repository
+-- =====================================================
+
+create or replace function create_repository
+(
+    p_repository_name text
+)
+returns bigint
+language plpgsql
+as
+$$
+declare
+    v_repository_id bigint;
+begin
+
+    insert into repository
+    (
+        repository_name
+    )
+    values
+    (
+        p_repository_name
+    )
+    on conflict (repository_name)
+    do update
+       set repository_name = excluded.repository_name
+    returning repository_id
+    into v_repository_id;
+
+    return v_repository_id;
+
+end;
+$$;
+
+comment on function create_repository(text)
+is 'Creates a repository and returns repository_id.';
+
+
+-- =====================================================
+-- get_repository_id
+-- =====================================================
+
+create or replace function get_repository_id
+(
+    p_repository_name text
+)
+returns bigint
+language sql
+stable
+as
+$$
+    select repository_id
+    from repository
+    where repository_name = p_repository_name;
+$$;
+
+comment on function get_repository_id(text)
+is 'Returns repository_id by repository name.';
+
+
+-- =====================================================
+-- get_repository_name
+-- =====================================================
+
+create or replace function get_repository_name
+(
+    p_repository_id bigint
+)
+returns text
+language sql
+stable
+as
+$$
+    select repository_name
+    from repository
+    where repository_id = p_repository_id;
+$$;
+
+comment on function get_repository_name(bigint)
+is 'Returns repository name from repository_id.';
+
+
+-- =====================================================
+-- get_or_create_repository
+-- =====================================================
+
+create or replace function get_or_create_repository
+(
+    p_repository_name text
+)
+returns bigint
+language plpgsql
+as
+$$
+declare
+    v_repository_id bigint;
+begin
+
+    select repository_id
+      into v_repository_id
+      from repository
+     where repository_name = p_repository_name;
+
+    if v_repository_id is not null then
+        return v_repository_id;
+    end if;
+
+    return create_repository(
+        p_repository_name
+    );
+
+end;
+$$;
+
+comment on function get_or_create_repository(text)
+is 'Returns existing repository_id or creates a repository.';
+
+
+-- =====================================================
+-- delete_repository
+-- =====================================================
+
+create or replace function delete_repository
+(
+    p_repository_id bigint
+)
+returns void
+language plpgsql
+as
+$$
+begin
+
+    delete
+      from repository
+     where repository_id = p_repository_id;
+
+end;
+$$;
+
+comment on function delete_repository(bigint)
+is 'Deletes a repository.';
+
+
+-- =====================================================
+-- get_repository_count
+-- =====================================================
+
+create or replace function get_repository_count()
+returns bigint
+language sql
+stable
+as
+$$
+    select count(*)
+    from repository;
+$$;
+
+comment on function get_repository_count()
+is 'Returns total number of repositories.';
+
+
+-- =====================================================
+-- get_all_repositories
+-- =====================================================
+
+create or replace function get_all_repositories()
+returns table
+(
+    repository_id bigint,
+    repository_name text,
+    created_at timestamptz
+)
+language sql
+stable
+as
+$$
+    select
+        r.repository_id,
+        r.repository_name,
+        r.created_at
+    from repository r
+    order by r.repository_id;
+$$;
+
+comment on function get_all_repositories()
+is 'Returns all repositories.';
+
+
+-- =====================================================
+-- rename_repository
+-- =====================================================
+
+create or replace function rename_repository
+(
+    p_repository_id bigint,
+    p_repository_name text
+)
+returns void
+language plpgsql
+as
+$$
+begin
+
+    update repository
+       set repository_name = p_repository_name
+     where repository_id = p_repository_id;
+
+end;
+$$;
+
+comment on function rename_repository(bigint, text)
+is 'Renames a repository.';
+
+-- =====================================================
+-- head_exists
+-- =====================================================
+
+create or replace function head_exists
+(
+    p_repository_id bigint
+)
+returns boolean
+language sql
+stable
+as
+$$
+    select exists
+    (
+        select 1
+        from git_head
+        where repository_id = p_repository_id
+    );
+$$;
+
+comment on function head_exists(bigint)
+is 'Checks whether HEAD exists for a repository.';
+
+
+-- =====================================================
+-- set_head_branch
+-- =====================================================
+
+create or replace function set_head_branch
+(
+    p_repository_id bigint,
+    p_ref_name text
+)
+returns void
+language plpgsql
+as
+$$
+begin
+
+    insert into git_head
+    (
+        repository_id,
+        ref_name,
+        detached_hash
+    )
+    values
+    (
+        p_repository_id,
+        p_ref_name,
+        null
+    )
+    on conflict (repository_id)
+    do update
+       set ref_name = excluded.ref_name,
+           detached_hash = null;
+
+end;
+$$;
+
+comment on function set_head_branch(bigint,text)
+is 'Attaches HEAD to a branch reference.';
+
+
+-- =====================================================
+-- set_head_commit
+-- =====================================================
+
+create or replace function set_head_commit
+(
+    p_repository_id bigint,
+    p_commit_hash varchar(64)
+)
+returns void
+language plpgsql
+as
+$$
+begin
+
+    insert into git_head
+    (
+        repository_id,
+        ref_name,
+        detached_hash
+    )
+    values
+    (
+        p_repository_id,
+        null,
+        p_commit_hash
+    )
+    on conflict (repository_id)
+    do update
+       set ref_name = null,
+           detached_hash = excluded.detached_hash;
+
+end;
+$$;
+
+comment on function set_head_commit(bigint,varchar)
+is 'Places HEAD in detached mode at a specific commit.';
+
+
+-- =====================================================
+-- get_head
+-- =====================================================
+
+create or replace function get_head
+(
+    p_repository_id bigint
+)
+returns text
+language sql
+stable
+as
+$$
+    select ref_name
+    from git_head
+    where repository_id = p_repository_id;
+$$;
+
+comment on function get_head(bigint)
+is 'Returns current HEAD reference name.';
+
+
+-- =====================================================
+-- get_head_commit
+-- =====================================================
+
+create or replace function get_head_commit
+(
+    p_repository_id bigint
+)
+returns varchar(64)
+language sql
+stable
+as
+$$
+    select detached_hash
+    from git_head
+    where repository_id = p_repository_id;
+$$;
+
+comment on function get_head_commit(bigint)
+is 'Returns detached HEAD commit hash.';
+
+
+-- =====================================================
+-- is_head_detached
+-- =====================================================
+
+create or replace function is_head_detached
+(
+    p_repository_id bigint
+)
+returns boolean
+language sql
+stable
+as
+$$
+    select coalesce
+    (
+        (
+            select detached_hash is not null
+            from git_head
+            where repository_id = p_repository_id
+        ),
+        false
+    );
+$$;
+
+comment on function is_head_detached(bigint)
+is 'Returns true when HEAD points directly to a commit.';
+
+
+-- =====================================================
+-- detach_head
+-- =====================================================
+
+create or replace function detach_head
+(
+    p_repository_id bigint
+)
+returns void
+language plpgsql
+as
+$$
+begin
+
+    update git_head
+       set ref_name = null
+     where repository_id = p_repository_id
+       and detached_hash is not null;
+
+end;
+$$;
+
+comment on function detach_head(bigint)
+is 'Keeps HEAD detached and clears any attached branch reference.';
+
+
+-- =====================================================
+-- delete_head
+-- =====================================================
+
+create or replace function delete_head
+(
+    p_repository_id bigint
+)
+returns void
+language plpgsql
+as
+$$
+begin
+
+    delete
+      from git_head
+     where repository_id = p_repository_id;
+
+end;
+$$;
+
+comment on function delete_head(bigint)
+is 'Deletes HEAD entry for a repository.';
+
+
+-- =====================================================
+-- get_head_state
+-- =====================================================
+
+create or replace function get_head_state
+(
+    p_repository_id bigint
+)
+returns table
+(
+    repository_id bigint,
+    ref_name text,
+    detached_hash varchar(64),
+    is_detached boolean
+)
+language sql
+stable
+as
+$$
+    select
+        h.repository_id,
+        h.ref_name,
+        h.detached_hash,
+        h.detached_hash is not null
+    from git_head h
+    where h.repository_id = p_repository_id;
+$$;
+
+comment on function get_head_state(bigint)
+is 'Returns complete HEAD state for a repository.';
