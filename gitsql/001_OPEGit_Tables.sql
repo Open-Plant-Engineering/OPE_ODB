@@ -21,12 +21,9 @@ comment on table repository is
 -- Global deduplicated value storage
 -- One row = one unique scalar value
 -- =====================================================
-
 create table git_blob_chunk_pool
 (
-    chunk_id bigint generated always as identity primary key,
-
-    chunk_hash varchar(64) not null unique,
+    chunk_hash varchar(64) not null,
 
     data_type_id smallint not null,
 
@@ -53,10 +50,9 @@ create table git_blob_chunk_pool
     jsonb_value jsonb,
 
     binary_value bytea,
-    
-    primary key (chunk_id, chunk_hash),
 
-    unique (chunk_hash)
+    constraint pk_git_blob_chunk_pool
+        primary key (chunk_hash)
 )
 partition by hash (chunk_hash);
 
@@ -134,7 +130,7 @@ create table git_element_manifest_entry
 
     attribute_id integer not null,
 
-    chunk_id bigint not null,
+    chunk_hash varchar(64) not null,
 
     primary key
     (
@@ -147,8 +143,8 @@ create table git_element_manifest_entry
         references git_element_manifest(manifest_id),
 
     constraint fk_manifest_entry_chunk
-        foreign key (chunk_id)
-        references git_blob_chunk_pool(chunk_id)
+        foreign key (chunk_hash)
+        references git_blob_chunk_pool(chunk_hash)
 )
 partition by hash (manifest_id);
 
@@ -552,7 +548,7 @@ comment on index idx_git_element_manifest_hash is
 -- =====================================================
 
 create index idx_manifest_entry_chunk
-on git_element_manifest_entry(chunk_id);
+on git_element_manifest_entry(chunk_hash);
 
 comment on index idx_manifest_entry_chunk is
 'Finds all manifests referencing a specific chunk.';
@@ -567,7 +563,7 @@ create index idx_manifest_entry_attr_chunk
 on git_element_manifest_entry
 (
     attribute_id,
-    chunk_id
+    chunk_hash
 );
 
 comment on index idx_manifest_entry_attr_chunk is

@@ -13,18 +13,18 @@ create or replace function get_chunk_by_hash
 (
     p_chunk_hash varchar(64)
 )
-returns bigint
+returns varchar(64)
 language sql
 stable
 as
 $$
-    select chunk_id
+    select chunk_hash
     from git_blob_chunk_pool
     where chunk_hash = p_chunk_hash;
 $$;
 
 comment on function get_chunk_by_hash(varchar)
-is 'Returns a chunk identifier from a chunk hash.';
+is 'Returns a chunk hash.';
 
 
 
@@ -48,30 +48,30 @@ create or replace function get_chunk_by_value
     p_jsonb_value jsonb default null,
     p_binary_value bytea default null
 )
-returns bigint
+returns varchar(64)
 language sql
 stable
 as
 $$
-    select chunk_id
+    select chunk_hash
     from git_blob_chunk_pool
     where data_type_id = p_data_type_id
-    and string_value    is not distinct from p_string_value
-    and integer_value   is not distinct from p_integer_value
-    and numeric_value   is not distinct from p_numeric_value
-    and real_value      is not distinct from p_real_value
-    and boolean_value   is not distinct from p_boolean_value
-    and date_value      is not distinct from p_date_value
-    and time_value      is not distinct from p_time_value
-    and datetime_value  is not distinct from p_datetime_value
-    and interval_value  is not distinct from p_interval_value
-    and uuid_value      is not distinct from p_uuid_value
-    and jsonb_value     is not distinct from p_jsonb_value
-    and binary_value    is not distinct from p_binary_value;
+      and string_value   is not distinct from p_string_value
+      and integer_value  is not distinct from p_integer_value
+      and numeric_value  is not distinct from p_numeric_value
+      and real_value     is not distinct from p_real_value
+      and boolean_value  is not distinct from p_boolean_value
+      and date_value     is not distinct from p_date_value
+      and time_value     is not distinct from p_time_value
+      and datetime_value is not distinct from p_datetime_value
+      and interval_value is not distinct from p_interval_value
+      and uuid_value     is not distinct from p_uuid_value
+      and jsonb_value    is not distinct from p_jsonb_value
+      and binary_value   is not distinct from p_binary_value;
 $$;
 
 comment on function get_chunk_by_value
-is 'Returns chunk identifier for an existing typed value.';
+is 'Returns chunk hash for an existing typed value.';
 
 
 
@@ -98,12 +98,12 @@ create or replace function create_chunk
     p_jsonb_value jsonb default null,
     p_binary_value bytea default null
 )
-returns bigint
+returns varchar(64)
 language plpgsql
 as
 $$
 declare
-    v_chunk_id bigint;
+    v_chunk_hash varchar(64);
 begin
 
     insert into git_blob_chunk_pool
@@ -143,16 +143,16 @@ begin
     on conflict (chunk_hash)
     do update
         set chunk_hash = excluded.chunk_hash
-    returning chunk_id
-    into v_chunk_id;
+    returning chunk_hash
+    into v_chunk_hash;
 
-    return v_chunk_id;
+    return v_chunk_hash;
 
 end;
 $$;
 
 comment on function create_chunk
-is 'Creates a new chunk record and returns chunk identifier.';
+is 'Creates a chunk and returns its hash.';
 
 
 
@@ -179,23 +179,21 @@ create or replace function get_or_create_chunk
     p_jsonb_value jsonb default null,
     p_binary_value bytea default null
 )
-returns bigint
+returns varchar(64)
 language plpgsql
 as
 $$
 declare
-
-    v_chunk_id bigint;
-
+    v_chunk_hash varchar(64);
 begin
 
-    select chunk_id
-    into v_chunk_id
-    from git_blob_chunk_pool
-    where chunk_hash = p_chunk_hash;
+    select chunk_hash
+      into v_chunk_hash
+      from git_blob_chunk_pool
+     where chunk_hash = p_chunk_hash;
 
-    if v_chunk_id is not null then
-        return v_chunk_id;
+    if v_chunk_hash is not null then
+        return v_chunk_hash;
     end if;
 
     return create_chunk
@@ -222,7 +220,7 @@ end;
 $$;
 
 comment on function get_or_create_chunk
-is 'Returns existing chunk or creates a new one.';
+is 'Returns existing chunk hash or creates a new chunk.';
 
 
 -- =====================================================
@@ -358,7 +356,7 @@ create or replace function add_manifest_entry
 (
     p_manifest_id bigint,
     p_attribute_id integer,
-    p_chunk_id bigint
+    p_chunk_hash varchar(64)
 )
 returns void
 language plpgsql
@@ -370,13 +368,13 @@ begin
     (
         manifest_id,
         attribute_id,
-        chunk_id
+        chunk_hash
     )
     values
     (
         p_manifest_id,
         p_attribute_id,
-        p_chunk_id
+        p_chunk_hash
     )
     on conflict
     (
@@ -384,7 +382,7 @@ begin
         attribute_id
     )
     do update
-    set chunk_id = excluded.chunk_id;
+    set chunk_hash = excluded.chunk_hash;
 
 end;
 $$;
@@ -402,15 +400,15 @@ create or replace function get_manifest_entry
     p_manifest_id bigint,
     p_attribute_id integer
 )
-returns bigint
+returns varchar(64)
 language sql
 stable
 as
 $$
-    select chunk_id
+    select chunk_hash
     from git_element_manifest_entry
     where manifest_id = p_manifest_id
-    and attribute_id = p_attribute_id;
+      and attribute_id = p_attribute_id;
 $$;
 
 comment on function get_manifest_entry
@@ -428,7 +426,7 @@ create or replace function get_manifest_entries
 returns table
 (
     attribute_id integer,
-    chunk_id bigint
+    chunk_hash varchar(64)
 )
 language sql
 stable
@@ -436,7 +434,7 @@ as
 $$
     select
         attribute_id,
-        chunk_id
+        chunk_hash
     from git_element_manifest_entry
     where manifest_id = p_manifest_id
     order by attribute_id;
@@ -2016,4 +2014,130 @@ $$;
 comment on function checkout_tag(bigint,text)
 is 'Checks out a tag in detached HEAD mode.';
 
+create table git_blob_chunk_pool_p00
+partition of git_blob_chunk_pool
+for values with (modulus 16, remainder 0);
 
+create table git_blob_chunk_pool_p01
+partition of git_blob_chunk_pool
+for values with (modulus 16, remainder 1);
+
+create table git_blob_chunk_pool_p02
+partition of git_blob_chunk_pool
+for values with (modulus 16, remainder 2);
+
+create table git_blob_chunk_pool_p03
+partition of git_blob_chunk_pool
+for values with (modulus 16, remainder 3);
+
+create table git_blob_chunk_pool_p04
+partition of git_blob_chunk_pool
+for values with (modulus 16, remainder 4);
+
+create table git_blob_chunk_pool_p05
+partition of git_blob_chunk_pool
+for values with (modulus 16, remainder 5);
+
+create table git_blob_chunk_pool_p06
+partition of git_blob_chunk_pool
+for values with (modulus 16, remainder 6);
+
+create table git_blob_chunk_pool_p07
+partition of git_blob_chunk_pool
+for values with (modulus 16, remainder 7);
+
+create table git_blob_chunk_pool_p08
+partition of git_blob_chunk_pool
+for values with (modulus 16, remainder 8);
+
+create table git_blob_chunk_pool_p09
+partition of git_blob_chunk_pool
+for values with (modulus 16, remainder 9);
+
+create table git_blob_chunk_pool_p10
+partition of git_blob_chunk_pool
+for values with (modulus 16, remainder 10);
+
+create table git_blob_chunk_pool_p11
+partition of git_blob_chunk_pool
+for values with (modulus 16, remainder 11);
+
+create table git_blob_chunk_pool_p12
+partition of git_blob_chunk_pool
+for values with (modulus 16, remainder 12);
+
+create table git_blob_chunk_pool_p13
+partition of git_blob_chunk_pool
+for values with (modulus 16, remainder 13);
+
+create table git_blob_chunk_pool_p14
+partition of git_blob_chunk_pool
+for values with (modulus 16, remainder 14);
+
+create table git_blob_chunk_pool_p15
+partition of git_blob_chunk_pool
+for values with (modulus 16, remainder 15);
+
+create table git_element_manifest_entry_p00
+partition of git_element_manifest_entry
+for values with (modulus 16, remainder 0);
+
+create table git_element_manifest_entry_p01
+partition of git_element_manifest_entry
+for values with (modulus 16, remainder 1);
+
+create table git_element_manifest_entry_p02
+partition of git_element_manifest_entry
+for values with (modulus 16, remainder 2);
+
+create table git_element_manifest_entry_p03
+partition of git_element_manifest_entry
+for values with (modulus 16, remainder 3);
+
+create table git_element_manifest_entry_p04
+partition of git_element_manifest_entry
+for values with (modulus 16, remainder 4);
+
+create table git_element_manifest_entry_p05
+partition of git_element_manifest_entry
+for values with (modulus 16, remainder 5);
+
+create table git_element_manifest_entry_p06
+partition of git_element_manifest_entry
+for values with (modulus 16, remainder 6);
+
+create table git_element_manifest_entry_p07
+partition of git_element_manifest_entry
+for values with (modulus 16, remainder 7);
+
+create table git_element_manifest_entry_p08
+partition of git_element_manifest_entry
+for values with (modulus 16, remainder 8);
+
+create table git_element_manifest_entry_p09
+partition of git_element_manifest_entry
+for values with (modulus 16, remainder 9);
+
+create table git_element_manifest_entry_p10
+partition of git_element_manifest_entry
+for values with (modulus 16, remainder 10);
+
+create table git_element_manifest_entry_p11
+partition of git_element_manifest_entry
+for values with (modulus 16, remainder 11);
+
+create table git_element_manifest_entry_p12
+partition of git_element_manifest_entry
+for values with (modulus 16, remainder 12);
+
+create table git_element_manifest_entry_p13
+partition of git_element_manifest_entry
+for values with (modulus 16, remainder 13);
+
+create table git_element_manifest_entry_p14
+partition of git_element_manifest_entry
+for values with (modulus 16, remainder 14);
+
+create table git_element_manifest_entry_p15
+partition of git_element_manifest_entry
+for values with (modulus 16, remainder 15);
