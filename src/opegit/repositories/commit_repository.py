@@ -173,3 +173,25 @@ class CommitRepository:
                 row = cur.fetchone()
 
         return row[0]
+
+    @staticmethod
+    def get_commit(
+        commit_hash: str,
+    ) -> tuple | None:
+
+        pool = DatabaseConnection.get_pool()
+
+        with pool.connection() as conn:
+            with conn.cursor() as cur:
+
+                cur.execute(
+                    """
+                    select *
+                    from get_commit(%s);
+                    """,
+                    (commit_hash,),
+                )
+
+                row = cur.fetchone()
+
+        return row
