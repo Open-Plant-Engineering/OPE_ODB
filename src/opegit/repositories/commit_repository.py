@@ -195,3 +195,54 @@ class CommitRepository:
                 row = cur.fetchone()
 
         return row
+    
+    @staticmethod
+    def add_commit_parent(
+        commit_hash: str,
+        parent_hash: str,
+        parent_index: int,
+    ) -> None:
+
+        pool = DatabaseConnection.get_pool()
+
+        with pool.connection() as conn:
+            with conn.cursor() as cur:
+
+                cur.execute(
+                    """
+                    select add_commit_parent(
+                        %s,
+                        %s,
+                        %s
+                    );
+                    """,
+                    (
+                        commit_hash,
+                        parent_hash,
+                        parent_index,
+                    ),
+                )
+
+            conn.commit()
+
+    @staticmethod
+    def get_commit_parents(
+        commit_hash: str,
+    ) -> list[tuple[str, int]]:
+    
+        pool = DatabaseConnection.get_pool()
+    
+        with pool.connection() as conn:
+            with conn.cursor() as cur:
+            
+                cur.execute(
+                    """
+                    select *
+                    from get_commit_parents(%s);
+                    """,
+                    (commit_hash,),
+                )
+    
+                rows = cur.fetchall()
+    
+        return rows

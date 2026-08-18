@@ -221,3 +221,25 @@ class ChunkRepository:
             conn.commit()
 
         return row[0]
+
+    @staticmethod
+    def get_chunk(
+        chunk_hash: str,
+    ) -> tuple | None:
+
+        pool = DatabaseConnection.get_pool()
+
+        with pool.connection() as conn:
+            with conn.cursor() as cur:
+
+                cur.execute(
+                    """
+                    select *
+                    from get_chunk(%s);
+                    """,
+                    (chunk_hash,),
+                )
+
+                row = cur.fetchone()
+
+        return row
