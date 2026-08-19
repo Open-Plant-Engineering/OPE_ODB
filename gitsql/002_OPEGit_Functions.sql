@@ -2638,3 +2638,56 @@ $$;
 
 comment on function get_head_state(bigint)
 is 'Returns complete HEAD state for a repository.';
+
+
+-- =====================================================
+-- get_chunk
+-- =====================================================
+
+create or replace function get_chunk
+(
+    p_chunk_hash varchar(64)
+)
+returns table
+(
+    chunk_hash varchar(64),
+    data_type_id smallint,
+    string_value text,
+    integer_value bigint,
+    numeric_value numeric,
+    real_value double precision,
+    boolean_value boolean,
+    date_value date,
+    time_value time,
+    datetime_value timestamptz,
+    interval_value interval,
+    uuid_value uuid,
+    jsonb_value jsonb,
+    binary_value bytea
+)
+language sql
+stable
+as
+$$
+    select
+        chunk_hash,
+        data_type_id,
+        string_value,
+        integer_value,
+        numeric_value,
+        real_value,
+        boolean_value,
+        date_value,
+        time_value,
+        datetime_value,
+        interval_value,
+        uuid_value,
+        jsonb_value,
+        binary_value
+    from git_blob_chunk_pool
+    where chunk_hash = p_chunk_hash;
+$$;
+
+comment on function get_chunk(varchar)
+is 'Returns a complete chunk record by chunk hash.';
+
