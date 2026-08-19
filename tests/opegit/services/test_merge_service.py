@@ -83,3 +83,13 @@ def test_fast_forward_merge() -> None:
     )
 
     assert main_head == develop_commit
+
+    develop_head = (
+        BranchService.get_branch_head(
+            repository_id,
+            "develop",
+        )
+    )
+
+    assert develop_head == develop_commit
+    assert main_head == develop_head

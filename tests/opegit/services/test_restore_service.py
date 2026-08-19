@@ -100,3 +100,55 @@ def test_restore_service() -> None:
         restored[0]["local_id"]
         == 1
     )
+
+from opegit.services.restore_service import (
+    RestoreService,
+)
+
+from opegit.services.commit_workflow_service import (
+    CommitWorkflowService,
+)
+
+from opegit.services.repository_workflow_service import (
+    RepositoryWorkflowService,
+)
+
+from opegit.repositories.tree_repository import (
+    TreeRepository,
+)
+
+
+def test_restore_service_b() -> None:
+
+    repository_id = (
+        RepositoryWorkflowService.init_repository(
+            "TEST_REPO"
+        )
+    )
+
+    tree_hash = "b" * 64
+
+    TreeRepository.create_tree(
+        tree_hash
+    )
+
+    commit_hash = (
+        CommitWorkflowService.commit(
+            repository_id=repository_id,
+            tree_hash=tree_hash,
+            author_name="Test",
+            author_email="test@test.com",
+            message="Initial Commit",
+        )
+    )
+
+    restored = (
+        RestoreService.restore_commit(
+            commit_hash
+        )
+    )
+
+    assert isinstance(
+        restored,
+        list,
+    )

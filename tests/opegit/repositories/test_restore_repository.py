@@ -105,3 +105,55 @@ def test_restore_commit() -> None:
         result[0]["manifest_id"]
         == manifest_id
     )
+
+from opegit.repositories.restore_repository import (
+    RestoreRepository,
+)
+
+from opegit.services.commit_workflow_service import (
+    CommitWorkflowService,
+)
+
+from opegit.services.repository_workflow_service import (
+    RepositoryWorkflowService,
+)
+
+from opegit.repositories.tree_repository import (
+    TreeRepository,
+)
+
+
+def test_restore_commit_a() -> None:
+
+    repository_id = (
+        RepositoryWorkflowService.init_repository(
+            "TEST_REPO"
+        )
+    )
+
+    tree_hash = "a" * 64
+
+    TreeRepository.create_tree(
+        tree_hash
+    )
+
+    commit_hash = (
+        CommitWorkflowService.commit(
+            repository_id=repository_id,
+            tree_hash=tree_hash,
+            author_name="Test",
+            author_email="test@test.com",
+            message="Initial Commit",
+        )
+    )
+
+    restored = (
+        RestoreRepository.restore_commit(
+            commit_hash
+        )
+    )
+
+    assert isinstance(
+        restored,
+        list,
+    )
